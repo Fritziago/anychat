@@ -13,14 +13,15 @@
     <main class="shell">
       <section class="hero">
         <p class="eyebrow">Incognito chatroom</p>
-        <h1>Talk freely. Leave no trail.</h1>
+        <h1>Talk freely. Shape the atmosphere.</h1>
         <p class="lede">
-          Create a private room, invite people with the link, and chat with a throwaway alias.
-          No sign-in. No database. No message history after the server stops.
+          Create a private room, invite people with the link, and tune the look to fit the
+          mood. No sign-in. No database. No history after the server stops.
         </p>
         <div class="hero-actions">
           <button id="create-room" class="button button-primary">Create room</button>
           <button id="copy-link" class="button button-ghost" disabled>Copy invite link</button>
+          <button id="open-settings" class="button button-ghost">Customize</button>
         </div>
       </section>
 
@@ -70,6 +71,187 @@
         <input id="file-input" type="file" hidden />
       </section>
     </main>
+
+    <div id="settings-scrim" class="settings-scrim" hidden></div>
+
+    <aside id="settings-drawer" class="settings-drawer" aria-hidden="true">
+      <div class="settings-header">
+        <div>
+          <p class="panel-label">Design Studio</p>
+          <h2>Customize the room</h2>
+        </div>
+        <div class="settings-header-actions">
+          <button id="reset-settings" class="button button-ghost button-slim" type="button">
+            Reset
+          </button>
+          <button id="close-settings" class="button button-ghost button-slim" type="button">
+            Close
+          </button>
+        </div>
+      </div>
+
+      <div class="settings-preview">
+        <div class="settings-preview-copy">
+          <p class="panel-label">Live preview</p>
+          <p id="custom-indicator" class="custom-indicator">Preset: Shadow Bloom</p>
+        </div>
+        <div class="preview-stack">
+          <article class="message preview-message">
+            <div class="message-meta">
+              <span class="message-author">Velvet Echo</span>
+              <time class="message-time">20:17</time>
+            </div>
+            <div class="message-content">
+              <p class="message-text">Dial in the color, texture, spacing, and mood in real time.</p>
+            </div>
+          </article>
+          <article class="message system preview-message">
+            <div class="message-meta">
+              <span class="message-author">System</span>
+              <time class="message-time">20:18</time>
+            </div>
+            <div class="message-content">
+              <p class="message-text">Your settings stay on this device.</p>
+            </div>
+          </article>
+        </div>
+      </div>
+
+      <div class="settings-section">
+        <div class="settings-section-head">
+          <h3>Presets</h3>
+          <p>Start with a polished look, then remix it.</p>
+        </div>
+        <div class="preset-grid">
+          <button class="preset-tile" data-preset="shadow" type="button">
+            <span class="preset-name">Shadow Bloom</span>
+            <span class="preset-copy">Mint glow and soft glass.</span>
+          </button>
+          <button class="preset-tile" data-preset="frost" type="button">
+            <span class="preset-name">Frost Signal</span>
+            <span class="preset-copy">Sharper blue lines and tech edges.</span>
+          </button>
+          <button class="preset-tile" data-preset="ember" type="button">
+            <span class="preset-name">Ember Lounge</span>
+            <span class="preset-copy">Warm amber depth with heavier cards.</span>
+          </button>
+          <button class="preset-tile" data-preset="studio" type="button">
+            <span class="preset-name">Studio Slate</span>
+            <span class="preset-copy">Minimal contrast with editorial type.</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="settings-section">
+        <div class="settings-section-head">
+          <h3>Custom controls</h3>
+          <p>Mix your own visual recipe.</p>
+        </div>
+
+        <div class="settings-grid">
+          <label class="setting-control">
+            <span class="setting-row">
+              <span>Accent hue</span>
+              <output id="accent-hue-value" for="accent-hue">142°</output>
+            </span>
+            <input id="accent-hue" type="range" min="0" max="360" step="1" value="142" />
+          </label>
+
+          <label class="setting-control">
+            <span class="setting-row">
+              <span>Glow strength</span>
+              <output id="glow-value" for="glow-strength">54%</output>
+            </span>
+            <input id="glow-strength" type="range" min="20" max="95" step="1" value="54" />
+          </label>
+
+          <label class="setting-control">
+            <span class="setting-row">
+              <span>Corner roundness</span>
+              <output id="radius-value" for="corner-radius">28 px</output>
+            </span>
+            <input id="corner-radius" type="range" min="16" max="40" step="1" value="28" />
+          </label>
+
+          <label class="setting-control">
+            <span class="setting-row">
+              <span>Glass blur</span>
+              <output id="blur-value" for="glass-blur">18 px</output>
+            </span>
+            <input id="glass-blur" type="range" min="8" max="28" step="1" value="18" />
+          </label>
+
+          <label class="setting-control">
+            <span class="setting-row">
+              <span>Text scale</span>
+              <output id="text-scale-value" for="text-scale">100%</output>
+            </span>
+            <input id="text-scale" type="range" min="92" max="116" step="1" value="100" />
+          </label>
+
+          <label class="setting-control">
+            <span class="setting-row">
+              <span>Background scene</span>
+            </span>
+            <select id="background-style">
+              <option value="aurora">Aurora wash</option>
+              <option value="grid">Signal grid</option>
+              <option value="eclipse">Eclipse halo</option>
+              <option value="studio">Studio grain</option>
+            </select>
+          </label>
+
+          <label class="setting-control">
+            <span class="setting-row">
+              <span>Message style</span>
+            </span>
+            <select id="bubble-style">
+              <option value="glass">Glass</option>
+              <option value="outline">Outline</option>
+              <option value="solid">Solid</option>
+            </select>
+          </label>
+
+          <label class="setting-control">
+            <span class="setting-row">
+              <span>Type mood</span>
+            </span>
+            <select id="font-mood">
+              <option value="signal">Signal</option>
+              <option value="editorial">Editorial</option>
+              <option value="tech">Tech</option>
+            </select>
+          </label>
+
+          <label class="setting-control">
+            <span class="setting-row">
+              <span>Density</span>
+            </span>
+            <select id="density">
+              <option value="compact">Compact</option>
+              <option value="cozy">Cozy</option>
+              <option value="airy">Airy</option>
+            </select>
+          </label>
+
+          <label class="setting-toggle" for="show-timestamps">
+            <span>
+              <strong>Show timestamps</strong>
+              <small>Display times on each message.</small>
+            </span>
+            <input id="show-timestamps" type="checkbox" checked />
+          </label>
+
+          <label class="setting-toggle" for="motion-enabled">
+            <span>
+              <strong>Soft motion</strong>
+              <small>Keep aurora drift and interface transitions.</small>
+            </span>
+            <input id="motion-enabled" type="checkbox" checked />
+          </label>
+        </div>
+      </div>
+    </aside>
 
     <template id="message-template">
       <article class="message">
