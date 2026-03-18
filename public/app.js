@@ -156,6 +156,116 @@ const presetSettings = {
     motion: false,
     ambientShapes: false,
   },
+  cathedral: {
+    preset: "cathedral",
+    accentHue: 42,
+    saturation: 88,
+    glow: 72,
+    shadowDepth: 52,
+    blur: 20,
+    surface: 78,
+    ambientScale: 126,
+    radius: 36,
+    textScale: 103,
+    density: "airy",
+    background: "cathedral",
+    pattern: "sunburst",
+    panelStyle: "tinted",
+    bubbleStyle: "soft",
+    messageWidth: "full",
+    fontMood: "cinema",
+    showTimestamps: true,
+    motion: true,
+    ambientShapes: true,
+  },
+  blueprint: {
+    preset: "blueprint",
+    accentHue: 212,
+    saturation: 96,
+    glow: 40,
+    shadowDepth: 30,
+    blur: 14,
+    surface: 70,
+    ambientScale: 90,
+    radius: 18,
+    textScale: 97,
+    density: "compact",
+    background: "grid",
+    pattern: "blueprint",
+    panelStyle: "frosted",
+    bubbleStyle: "outline",
+    messageWidth: "full",
+    fontMood: "tech",
+    showTimestamps: true,
+    motion: true,
+    ambientShapes: false,
+  },
+  paper: {
+    preset: "paper",
+    accentHue: 28,
+    saturation: 42,
+    glow: 24,
+    shadowDepth: 18,
+    blur: 8,
+    surface: 88,
+    ambientScale: 62,
+    radius: 24,
+    textScale: 101,
+    density: "cozy",
+    background: "paper",
+    pattern: "checker",
+    panelStyle: "paper",
+    bubbleStyle: "cutout",
+    messageWidth: "balanced",
+    fontMood: "editorial",
+    showTimestamps: false,
+    motion: false,
+    ambientShapes: false,
+  },
+  terminal: {
+    preset: "terminal",
+    accentHue: 128,
+    saturation: 62,
+    glow: 36,
+    shadowDepth: 68,
+    blur: 10,
+    surface: 90,
+    ambientScale: 70,
+    radius: 16,
+    textScale: 98,
+    density: "compact",
+    background: "terminal",
+    pattern: "beam",
+    panelStyle: "ink",
+    bubbleStyle: "cutout",
+    messageWidth: "narrow",
+    fontMood: "tech",
+    showTimestamps: true,
+    motion: true,
+    ambientShapes: false,
+  },
+  velvet: {
+    preset: "velvet",
+    accentHue: 348,
+    saturation: 72,
+    glow: 50,
+    shadowDepth: 60,
+    blur: 18,
+    surface: 76,
+    ambientScale: 108,
+    radius: 34,
+    textScale: 104,
+    density: "airy",
+    background: "velvet",
+    pattern: "rings",
+    panelStyle: "tinted",
+    bubbleStyle: "soft",
+    messageWidth: "balanced",
+    fontMood: "grotesk",
+    showTimestamps: true,
+    motion: true,
+    ambientShapes: true,
+  },
 };
 
 const presetLabels = {
@@ -165,6 +275,11 @@ const presetLabels = {
   studio: "Studio Slate",
   lagoon: "Lagoon Pulse",
   noir: "Mono Noir",
+  cathedral: "Solar Cathedral",
+  blueprint: "Blueprint Echo",
+  paper: "Paper Lantern",
+  terminal: "Green Room CRT",
+  velvet: "Velvet Broadcast",
   custom: "Custom Mix",
 };
 
@@ -259,22 +374,35 @@ function normalizeSettings(raw = {}) {
     radius: clampNumber(raw.radius, 16, 40, defaultSettings.radius),
     textScale: clampNumber(raw.textScale, 92, 116, defaultSettings.textScale),
     density: ["compact", "cozy", "airy"].includes(raw.density) ? raw.density : defaultSettings.density,
-    background: ["aurora", "grid", "eclipse", "studio", "lagoon", "sundown"].includes(raw.background)
+    background: [
+      "aurora",
+      "grid",
+      "eclipse",
+      "studio",
+      "lagoon",
+      "sundown",
+      "cathedral",
+      "paper",
+      "terminal",
+      "velvet",
+    ].includes(raw.background)
       ? raw.background
       : defaultSettings.background,
-    pattern: ["none", "grain", "rings", "beam"].includes(raw.pattern)
+    pattern: ["none", "grain", "rings", "beam", "blueprint", "checker", "sunburst"].includes(
+      raw.pattern
+    )
       ? raw.pattern
       : defaultSettings.pattern,
-    panelStyle: ["glass", "tinted", "ink"].includes(raw.panelStyle)
+    panelStyle: ["glass", "tinted", "ink", "frosted", "paper"].includes(raw.panelStyle)
       ? raw.panelStyle
       : defaultSettings.panelStyle,
-    bubbleStyle: ["glass", "outline", "solid", "soft"].includes(raw.bubbleStyle)
+    bubbleStyle: ["glass", "outline", "solid", "soft", "cutout"].includes(raw.bubbleStyle)
       ? raw.bubbleStyle
       : defaultSettings.bubbleStyle,
     messageWidth: ["narrow", "balanced", "full"].includes(raw.messageWidth)
       ? raw.messageWidth
       : defaultSettings.messageWidth,
-    fontMood: ["signal", "editorial", "tech", "cinema"].includes(raw.fontMood)
+    fontMood: ["signal", "editorial", "tech", "cinema", "grotesk"].includes(raw.fontMood)
       ? raw.fontMood
       : defaultSettings.fontMood,
     showTimestamps:

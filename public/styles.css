@@ -12,6 +12,12 @@
     linear-gradient(180deg, rgba(140, 255, 161, 0.08), rgba(255, 255, 255, 0)),
     rgba(7, 23, 31, 0.72);
   --panel-ink: rgba(4, 10, 14, 0.86);
+  --panel-frosted:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0.02)),
+    rgba(10, 20, 30, 0.62);
+  --panel-paper:
+    linear-gradient(180deg, rgba(255, 251, 240, 0.94), rgba(242, 231, 210, 0.9)),
+    rgba(248, 239, 220, 0.92);
   --panel-shell: var(--panel-surface);
   --orb-one: rgba(74, 255, 184, 0.18);
   --orb-two: rgba(59, 152, 255, 0.16);
@@ -124,6 +130,46 @@ body[data-background="sundown"] {
     linear-gradient(160deg, #140705 0%, #2a0c09 38%, #0c1218 100%);
 }
 
+body[data-background="cathedral"] {
+  background:
+    radial-gradient(circle at 50% 0%, rgba(255, 216, 135, 0.26), transparent 28%),
+    radial-gradient(circle at 12% 18%, rgba(255, 153, 71, 0.12), transparent 24%),
+    linear-gradient(180deg, #120b08 0%, #2a160d 36%, #0a1218 100%);
+}
+
+body[data-background="paper"] {
+  color: #2d241d;
+  --muted: #7d6858;
+  --warning: #946130;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.18), transparent 18%),
+    linear-gradient(145deg, #efe3cf 0%, #eadbc1 48%, #dbc4a2 100%);
+}
+
+body[data-background="paper"] .button-ghost,
+body[data-background="paper"] input,
+body[data-background="paper"] select {
+  color: #2d241d;
+}
+
+body[data-background="terminal"] {
+  background:
+    radial-gradient(circle at 50% 0%, rgba(96, 255, 126, 0.1), transparent 22%),
+    linear-gradient(180deg, rgba(67, 255, 95, 0.045) 1px, transparent 1px),
+    linear-gradient(180deg, #020704 0%, #041109 55%, #020704 100%);
+  background-size:
+    auto,
+    100% 4px,
+    auto;
+}
+
+body[data-background="velvet"] {
+  background:
+    radial-gradient(circle at 18% 16%, rgba(255, 123, 71, 0.14), transparent 24%),
+    radial-gradient(circle at 84% 18%, rgba(212, 72, 72, 0.2), transparent 26%),
+    linear-gradient(160deg, #17060a 0%, #330d16 40%, #0b1017 100%);
+}
+
 body[data-pattern="grain"]::before {
   opacity: 0.14;
   background-image: radial-gradient(circle at 1px 1px, rgba(255, 255, 255, 0.08) 1px, transparent 0);
@@ -145,6 +191,57 @@ body[data-pattern="beam"]::before {
     linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.03) 18%, transparent 36%);
 }
 
+body[data-pattern="blueprint"]::before {
+  opacity: 0.16;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.05) 1px, transparent 1px),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.025) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.025) 1px, transparent 1px);
+  background-size:
+    52px 52px,
+    52px 52px,
+    13px 13px,
+    13px 13px;
+}
+
+body[data-pattern="checker"]::before {
+  opacity: 0.08;
+  background:
+    linear-gradient(45deg, rgba(255, 255, 255, 0.08) 25%, transparent 25%, transparent 75%, rgba(255, 255, 255, 0.08) 75%),
+    linear-gradient(45deg, rgba(255, 255, 255, 0.08) 25%, transparent 25%, transparent 75%, rgba(255, 255, 255, 0.08) 75%);
+  background-size: 26px 26px;
+  background-position:
+    0 0,
+    13px 13px;
+}
+
+body[data-pattern="sunburst"]::before {
+  opacity: 0.16;
+  background:
+    conic-gradient(
+      from 270deg at 50% 6%,
+      rgba(255, 255, 255, 0.12) 0deg,
+      transparent 14deg,
+      rgba(255, 255, 255, 0.07) 22deg,
+      transparent 35deg,
+      rgba(255, 255, 255, 0.08) 44deg,
+      transparent 60deg,
+      rgba(255, 255, 255, 0.05) 72deg,
+      transparent 90deg,
+      rgba(255, 255, 255, 0.08) 110deg,
+      transparent 132deg,
+      rgba(255, 255, 255, 0.1) 152deg,
+      transparent 180deg,
+      rgba(255, 255, 255, 0.08) 205deg,
+      transparent 240deg,
+      rgba(255, 255, 255, 0.06) 265deg,
+      transparent 300deg,
+      rgba(255, 255, 255, 0.09) 328deg,
+      transparent 360deg
+    );
+}
+
 body[data-font="signal"] {
   --body-font: "Segoe UI", "Trebuchet MS", sans-serif;
   --display-font: "Arial Black", "Segoe UI", sans-serif;
@@ -163,6 +260,11 @@ body[data-font="tech"] {
 body[data-font="cinema"] {
   --body-font: "Gill Sans", "Trebuchet MS", sans-serif;
   --display-font: "Franklin Gothic Medium", "Arial Narrow", sans-serif;
+}
+
+body[data-font="grotesk"] {
+  --body-font: "Verdana", "Tahoma", sans-serif;
+  --display-font: "Impact", "Arial Black", sans-serif;
 }
 
 body[data-density="compact"] {
@@ -198,6 +300,14 @@ body[data-panel-style="ink"] {
   --panel-shell: var(--panel-ink);
 }
 
+body[data-panel-style="frosted"] {
+  --panel-shell: var(--panel-frosted);
+}
+
+body[data-panel-style="paper"] {
+  --panel-shell: var(--panel-paper);
+}
+
 body[data-bubble="glass"] {
   --surface-fill: rgba(255, 255, 255, 0.03);
   --surface-stroke: rgba(255, 255, 255, 0.08);
@@ -216,6 +326,11 @@ body[data-bubble="solid"] {
 body[data-bubble="soft"] {
   --surface-fill: var(--accent-soft);
   --surface-stroke: rgba(255, 255, 255, 0.06);
+}
+
+body[data-bubble="cutout"] {
+  --surface-fill: rgba(255, 255, 255, 0.015);
+  --surface-stroke: rgba(255, 255, 255, 0.18);
 }
 
 body[data-message-width="narrow"] {
@@ -283,6 +398,16 @@ body[data-background="grid"] .aurora {
 body[data-background="studio"] .aurora,
 body[data-background="sundown"] .aurora {
   opacity: 0.24;
+}
+
+body[data-background="paper"] .aurora,
+body[data-background="terminal"] .aurora {
+  opacity: 0.18;
+}
+
+body[data-background="velvet"] .aurora,
+body[data-background="cathedral"] .aurora {
+  opacity: 0.3;
 }
 
 .shell {
@@ -383,6 +508,11 @@ body[data-background="sundown"] .aurora {
   background: rgba(255, 255, 255, 0.06);
   color: var(--text);
   border: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+body[data-background="paper"] .button-ghost {
+  background: rgba(120, 94, 58, 0.08);
+  border-color: rgba(120, 94, 58, 0.16);
 }
 
 .button-slim {
@@ -519,6 +649,23 @@ select:focus {
 .message.system {
   background: var(--accent-soft);
   border-color: var(--accent-faint);
+}
+
+body[data-bubble="cutout"] .message {
+  box-shadow: none;
+  border-style: dashed;
+}
+
+body[data-background="paper"] .message,
+body[data-panel-style="paper"] .message {
+  color: #2d241d;
+}
+
+body[data-background="paper"] .message-author,
+body[data-panel-style="paper"] .message-author,
+body[data-background="paper"] .preset-name,
+body[data-panel-style="paper"] .preset-name {
+  color: #2d241d;
 }
 
 .message-meta {
