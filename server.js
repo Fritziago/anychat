@@ -500,7 +500,8 @@ function handleFileDownload(req, res, pathname) {
 }
 
 function serveStatic(req, res) {
-  const requestPath = req.url === "/" ? "/index.html" : req.url.split("?")[0];
+  const pathname = new URL(req.url || "/", "http://localhost").pathname;
+  const requestPath = pathname === "/" ? "/index.html" : pathname;
   const resolvedPath = path.normalize(path.join(PUBLIC_DIR, requestPath));
 
   if (!resolvedPath.startsWith(PUBLIC_DIR)) {
