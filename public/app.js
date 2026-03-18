@@ -20,6 +20,42 @@ const aliasNouns = [
 
 const SETTINGS_STORAGE_KEY = "shadow-room-settings-v1";
 const MAX_UPLOAD_SIZE_BYTES = 50 * 1024 * 1024;
+const AD_ROTATION_MS = 12000;
+
+const defaultAds = [
+  {
+    brand: "Shadow Room Plus",
+    headline: "Turn a private room into a polished launch space.",
+    copy:
+      "Use the design studio, preset worlds, and file sharing to make each room feel branded instead of generic.",
+    cta: "Open customization",
+    action: "settings",
+  },
+  {
+    brand: "Room Boost",
+    headline: "Spin up a fresh room for your next drop, event, or group.",
+    copy:
+      "This house ad slot can point to a sponsor, affiliate offer, or one of your own calls to action.",
+    cta: "Create room",
+    action: "create-room",
+  },
+  {
+    brand: "Invite Flow",
+    headline: "Share the link and pull people straight into the room.",
+    copy:
+      "These sponsor cards rotate automatically and can be replaced later with your own ad inventory.",
+    cta: "Copy invite",
+    action: "copy-invite",
+  },
+  {
+    brand: "Sponsor Slot",
+    headline: "Reserve a premium sidebar placement for a partner campaign.",
+    copy:
+      "Swap these defaults by setting window.SHADOW_ROOM_ADS before app.js loads, or edit the inventory here.",
+    cta: "View setup",
+    action: "settings",
+  },
+];
 
 const defaultSettings = {
   preset: "shadow",
@@ -306,6 +342,7 @@ const settingsDrawer = document.querySelector("#settings-drawer");
 const settingsScrim = document.querySelector("#settings-scrim");
 const customIndicator = document.querySelector("#custom-indicator");
 const presetButtons = Array.from(document.querySelectorAll("[data-preset]"));
+const adSlots = Array.from(document.querySelectorAll(".ad-slot"));
 
 const accentHueInput = document.querySelector("#accent-hue");
 const saturationInput = document.querySelector("#accent-saturation");
@@ -341,6 +378,8 @@ let socket;
 let joinedRoom = "";
 let joinedAlias = "";
 let currentSettings = loadSettings();
+let adIndex = 0;
+let adRotationTimer = 0;
 
 applySettings(currentSettings);
 syncSettingsUI();
@@ -428,6 +467,89 @@ function loadSettings() {
 
 function persistSettings() {
   localStorage.setItem(SETTINGS_STORAGE_KEY, JSON.stringify(currentSettings));
+}
+
+function normalizeAd(raw, index) {
+  return {
+    brand: String(raw.brand || `Promo ${index + 1}`).slice(0, 40),
+    headline: String(raw.headline || "Promote something here.").slice(0, 120),
+    copy: String(raw.copy || "Replace this slot with sponsor copy in public/app.js.").slice(0, 220),
+    cta: String(raw.cta || "Learn more").slice(0, 28),
+    href: typeof raw.href === "string" ? raw.href : "",
+    action: typeof raw.action === "string" ? raw.action : "",
+  };
+}
+
+function getAdInventory() {
+  const externalAds = Array.isArray(window.SHADOW_ROOM_ADS) ? window.SHADOW_ROOM_ADS : [];
+  const source = externalAds.length ? externalAds : defaultAds;
+  return source.map(normalizeAd);
+}
+
+function renderAd(slot, ad) {
+  slot.querySelector("[data-ad-brand]").textContent = ad.brand;
+  slot.querySelector("[data-ad-headline]").textContent = ad.headline;
+  slot.querySelector("[data-ad-copy]").textContent = ad.copy;
+
+  const cta = slot.querySelector("[data-ad-cta]");
+  cta.textContent = ad.cta;
+  cta.dataset.action = ad.action || "";
+  cta.href = ad.href || "#";
+
+  if (ad.href) {
+    cta.target = "_blank";
+    cta.rel = "noopener noreferrer";
+  } else {
+    cta.removeAttribute("target");
+    cta.removeAttribute("rel");
+  }
+}
+
+function renderAds() {
+  const ads = getAdInventory();
+  if (!ads.length) {
+    return;
+  }
+
+  for (let i = 0; i < adSlots.length; i += 1) {
+    const ad = ads[(adIndex + i) % ads.length];
+    renderAd(adSlots[i], ad);
+  }
+}
+
+function syncAdRotation() {
+  window.clearInterval(adRotationTimer);
+  const ads = getAdInventory();
+
+  if (!currentSettings.motion || ads.length <= 1) {
+    return;
+  }
+
+  adRotationTimer = window.setInterval(() => {
+    adIndex = (adIndex + 1) % ads.length;
+    renderAds();
+  }, AD_ROTATION_MS);
+}
+
+function handleAdAction(action) {
+  if (action === "settings") {
+    setSettingsOpen(true);
+    return;
+  }
+
+  if (action === "create-room") {
+    createRoomButton.click();
+    return;
+  }
+
+  if (action === "copy-invite") {
+    if (!joinedRoom) {
+      setStatus("Create and join a room before copying the invite link.", true);
+      return;
+    }
+
+    copyLinkButton.click();
+  }
 }
 
 function hsl(hue, saturation, lightness, alpha) {
@@ -532,6 +654,7 @@ function applyAndStore(nextSettings) {
   applySettings(currentSettings);
   syncSettingsUI();
   persistSettings();
+  syncAdRotation();
 }
 
 function usePreset(presetName) {
@@ -877,6 +1000,19 @@ copyLinkButton.addEventListener("click", async () => {
   }
 });
 
+for (const slot of adSlots) {
+  const cta = slot.querySelector("[data-ad-cta]");
+  cta.addEventListener("click", (event) => {
+    const action = cta.dataset.action;
+    if (!action) {
+      return;
+    }
+
+    event.preventDefault();
+    handleAdAction(action);
+  });
+}
+
 openSettingsButton.addEventListener("click", () => {
   setSettingsOpen(true);
 });
@@ -983,4 +1119,6 @@ ambientEnabledInput.addEventListener("change", () => {
 
 setChatEnabled(false);
 updateInviteLinkState();
+renderAds();
+syncAdRotation();
 setSettingsOpen(false);

@@ -51,6 +51,20 @@
 
         <div id="status" class="status">Choose a room and alias to step inside.</div>
 
+        <section class="ad-card inline-ad ad-slot" id="inline-ad-slot" aria-label="Sponsored">
+          <div class="ad-meta">
+            <span class="ad-badge">Sponsored</span>
+            <span class="ad-meta-note">Rotating slot</span>
+          </div>
+          <p class="ad-kicker" data-ad-brand>House Promo</p>
+          <h3 class="ad-headline" data-ad-headline>Style your room like a launch page.</h3>
+          <p class="ad-copy" data-ad-copy>
+            This slot can rotate affiliate offers, sponsors, or your own promos without changing
+            the chat layout.
+          </p>
+          <a class="ad-cta" data-ad-cta href="#">Open</a>
+        </section>
+
         <div id="messages" class="messages" aria-live="polite"></div>
 
         <form id="message-form" class="message-form">
@@ -70,6 +84,32 @@
         </form>
         <input id="file-input" type="file" hidden />
       </section>
+
+      <aside class="ad-rail panel" aria-label="Sponsor rail">
+        <div class="ad-rail-head">
+          <p class="panel-label">Sponsor Rail</p>
+          <p class="ad-rail-copy">Ad-ready space for promos and partner placements.</p>
+        </div>
+
+        <section class="ad-card ad-slot" id="sidebar-ad-slot" aria-label="Sponsored">
+          <div class="ad-meta">
+            <span class="ad-badge">Sponsored</span>
+            <span class="ad-meta-note">Sidebar slot</span>
+          </div>
+          <p class="ad-kicker" data-ad-brand>Promo Deck</p>
+          <h3 class="ad-headline" data-ad-headline>Reserve this card for a sponsor.</h3>
+          <p class="ad-copy" data-ad-copy>
+            You can keep these default promos or swap in your own ad inventory from the client
+            config.
+          </p>
+          <a class="ad-cta" data-ad-cta href="#">Customize</a>
+        </section>
+
+        <div class="ad-note">
+          <strong>Tip:</strong>
+          Replace the default promos in `public/app.js` or inject `window.SHADOW_ROOM_ADS`.
+        </div>
+      </aside>
     </main>
 
     <div id="settings-scrim" class="settings-scrim" hidden></div>
