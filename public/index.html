@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Shadow Room</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <div class="aurora aurora-one"></div>
+    <div class="aurora aurora-two"></div>
+
+    <main class="shell">
+      <section class="hero">
+        <p class="eyebrow">Incognito chatroom</p>
+        <h1>Talk freely. Leave no trail.</h1>
+        <p class="lede">
+          Create a private room, invite people with the link, and chat with a throwaway alias.
+          No sign-in. No database. No message history after the server stops.
+        </p>
+        <div class="hero-actions">
+          <button id="create-room" class="button button-primary">Create room</button>
+          <button id="copy-link" class="button button-ghost" disabled>Copy invite link</button>
+        </div>
+      </section>
+
+      <section class="panel">
+        <div class="panel-header">
+          <div>
+            <p class="panel-label">Room</p>
+            <h2 id="room-label">Not joined</h2>
+          </div>
+          <div class="presence">
+            <span class="presence-dot"></span>
+            <span id="presence-count">0 online</span>
+          </div>
+        </div>
+
+        <form id="join-form" class="join-form">
+          <label>
+            <span>Room code</span>
+            <input id="room-input" name="room" maxlength="32" placeholder="e.g. d4a1c2" />
+          </label>
+          <label>
+            <span>Incognito alias</span>
+            <input id="alias-input" name="alias" maxlength="24" placeholder="Shadow Fox" />
+          </label>
+          <button class="button button-primary" type="submit">Enter room</button>
+        </form>
+
+        <div id="status" class="status">Choose a room and alias to step inside.</div>
+
+        <div id="messages" class="messages" aria-live="polite"></div>
+
+        <form id="message-form" class="message-form">
+          <input
+            id="message-input"
+            name="message"
+            maxlength="500"
+            placeholder="Write a message that disappears with the room..."
+            disabled
+          />
+          <button id="send-button" class="button button-primary" type="submit" disabled>
+            Send
+          </button>
+        </form>
+      </section>
+    </main>
+
+    <template id="message-template">
+      <article class="message">
+        <div class="message-meta">
+          <span class="message-author"></span>
+          <time class="message-time"></time>
+        </div>
+        <p class="message-text"></p>
+      </article>
+    </template>
+
+    <script src="./app.js" defer></script>
+  </body>
+</html>

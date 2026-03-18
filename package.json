@@ -1,0 +1,9 @@
+{
+  "name": "anychat-incognito",
+  "version": "1.0.0",
+  "description": "Ephemeral incognito chatroom with no accounts and no persistence.",
+  "private": true,
+  "scripts": {
+    "start": "node server.js"
+  }
+}
