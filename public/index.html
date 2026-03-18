@@ -105,13 +105,25 @@
               <p class="message-text">Dial in the color, texture, spacing, and mood in real time.</p>
             </div>
           </article>
-          <article class="message system preview-message">
+          <article class="message preview-message">
             <div class="message-meta">
-              <span class="message-author">System</span>
+              <span class="message-author">Hidden Nomad</span>
               <time class="message-time">20:18</time>
             </div>
             <div class="message-content">
-              <p class="message-text">Your settings stay on this device.</p>
+              <a class="attachment" href="#">
+                <span class="attachment-name">moodboard.png</span>
+                <span class="attachment-size">4.2 MB download</span>
+              </a>
+            </div>
+          </article>
+          <article class="message system preview-message">
+            <div class="message-meta">
+              <span class="message-author">System</span>
+              <time class="message-time">20:19</time>
+            </div>
+            <div class="message-content">
+              <p class="message-text">Your settings stay on this device and remix instantly.</p>
             </div>
           </article>
         </div>
@@ -120,7 +132,7 @@
       <div class="settings-section">
         <div class="settings-section-head">
           <h3>Presets</h3>
-          <p>Start with a polished look, then remix it.</p>
+          <p>Start with a stronger direction, then mutate it.</p>
         </div>
         <div class="preset-grid">
           <button class="preset-tile" data-preset="shadow" type="button">
@@ -137,7 +149,15 @@
           </button>
           <button class="preset-tile" data-preset="studio" type="button">
             <span class="preset-name">Studio Slate</span>
-            <span class="preset-copy">Minimal contrast with editorial type.</span>
+            <span class="preset-copy">Quiet editorial mood with low motion.</span>
+          </button>
+          <button class="preset-tile" data-preset="lagoon" type="button">
+            <span class="preset-name">Lagoon Pulse</span>
+            <span class="preset-copy">Oceanic color with wider ambient glow.</span>
+          </button>
+          <button class="preset-tile" data-preset="noir" type="button">
+            <span class="preset-name">Mono Noir</span>
+            <span class="preset-copy">Ink-heavy chrome with restrained color.</span>
           </button>
         </div>
       </div>
@@ -145,16 +165,31 @@
       <div class="settings-section">
         <div class="settings-section-head">
           <h3>Custom controls</h3>
-          <p>Mix your own visual recipe.</p>
+          <p>More dials, still one coherent look.</p>
         </div>
 
         <div class="settings-grid">
           <label class="setting-control">
             <span class="setting-row">
               <span>Accent hue</span>
-              <output id="accent-hue-value" for="accent-hue">142°</output>
+              <output id="accent-hue-value" for="accent-hue">142 deg</output>
             </span>
             <input id="accent-hue" type="range" min="0" max="360" step="1" value="142" />
+          </label>
+
+          <label class="setting-control">
+            <span class="setting-row">
+              <span>Accent saturation</span>
+              <output id="saturation-value" for="accent-saturation">92%</output>
+            </span>
+            <input
+              id="accent-saturation"
+              type="range"
+              min="24"
+              max="100"
+              step="1"
+              value="92"
+            />
           </label>
 
           <label class="setting-control">
@@ -167,10 +202,10 @@
 
           <label class="setting-control">
             <span class="setting-row">
-              <span>Corner roundness</span>
-              <output id="radius-value" for="corner-radius">28 px</output>
+              <span>Shadow depth</span>
+              <output id="shadow-value" for="shadow-depth">42%</output>
             </span>
-            <input id="corner-radius" type="range" min="16" max="40" step="1" value="28" />
+            <input id="shadow-depth" type="range" min="16" max="90" step="1" value="42" />
           </label>
 
           <label class="setting-control">
@@ -179,6 +214,30 @@
               <output id="blur-value" for="glass-blur">18 px</output>
             </span>
             <input id="glass-blur" type="range" min="8" max="28" step="1" value="18" />
+          </label>
+
+          <label class="setting-control">
+            <span class="setting-row">
+              <span>Panel tint</span>
+              <output id="surface-value" for="panel-tint">72%</output>
+            </span>
+            <input id="panel-tint" type="range" min="48" max="90" step="1" value="72" />
+          </label>
+
+          <label class="setting-control">
+            <span class="setting-row">
+              <span>Ambient scale</span>
+              <output id="ambient-scale-value" for="ambient-scale">100%</output>
+            </span>
+            <input id="ambient-scale" type="range" min="60" max="140" step="1" value="100" />
+          </label>
+
+          <label class="setting-control">
+            <span class="setting-row">
+              <span>Corner roundness</span>
+              <output id="radius-value" for="corner-radius">28 px</output>
+            </span>
+            <input id="corner-radius" type="range" min="16" max="40" step="1" value="28" />
           </label>
 
           <label class="setting-control">
@@ -198,6 +257,31 @@
               <option value="grid">Signal grid</option>
               <option value="eclipse">Eclipse halo</option>
               <option value="studio">Studio grain</option>
+              <option value="lagoon">Lagoon haze</option>
+              <option value="sundown">Sundown heat</option>
+            </select>
+          </label>
+
+          <label class="setting-control">
+            <span class="setting-row">
+              <span>Overlay pattern</span>
+            </span>
+            <select id="pattern-style">
+              <option value="none">None</option>
+              <option value="grain">Grain</option>
+              <option value="rings">Rings</option>
+              <option value="beam">Beam lines</option>
+            </select>
+          </label>
+
+          <label class="setting-control">
+            <span class="setting-row">
+              <span>Panel finish</span>
+            </span>
+            <select id="panel-style">
+              <option value="glass">Glass</option>
+              <option value="tinted">Tinted</option>
+              <option value="ink">Ink</option>
             </select>
           </label>
 
@@ -209,6 +293,18 @@
               <option value="glass">Glass</option>
               <option value="outline">Outline</option>
               <option value="solid">Solid</option>
+              <option value="soft">Soft</option>
+            </select>
+          </label>
+
+          <label class="setting-control">
+            <span class="setting-row">
+              <span>Message width</span>
+            </span>
+            <select id="message-width">
+              <option value="narrow">Narrow</option>
+              <option value="balanced">Balanced</option>
+              <option value="full">Full</option>
             </select>
           </label>
 
@@ -220,6 +316,7 @@
               <option value="signal">Signal</option>
               <option value="editorial">Editorial</option>
               <option value="tech">Tech</option>
+              <option value="cinema">Cinema</option>
             </select>
           </label>
 
@@ -248,6 +345,14 @@
               <small>Keep aurora drift and interface transitions.</small>
             </span>
             <input id="motion-enabled" type="checkbox" checked />
+          </label>
+
+          <label class="setting-toggle" for="ambient-enabled">
+            <span>
+              <strong>Ambient shapes</strong>
+              <small>Show or hide the drifting background glow.</small>
+            </span>
+            <input id="ambient-enabled" type="checkbox" checked />
           </label>
         </div>
       </div>
