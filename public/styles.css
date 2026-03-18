@@ -263,8 +263,37 @@ input:focus {
 }
 
 .message-form {
-  grid-template-columns: 1fr auto;
+  grid-template-columns: 1fr auto auto;
   margin-top: 1rem;
+}
+
+.message-content {
+  display: grid;
+  gap: 0.7rem;
+}
+
+.attachment {
+  display: grid;
+  gap: 0.28rem;
+  padding: 0.85rem 0.95rem;
+  border-radius: 16px;
+  background: rgba(140, 255, 161, 0.08);
+  border: 1px solid rgba(140, 255, 161, 0.14);
+  color: var(--text);
+  text-decoration: none;
+}
+
+.attachment:hover {
+  background: rgba(140, 255, 161, 0.12);
+}
+
+.attachment-name {
+  font-weight: 700;
+}
+
+.attachment-size {
+  color: var(--muted);
+  font-size: 0.88rem;
 }
 
 @keyframes drift {
@@ -289,6 +318,10 @@ input:focus {
   }
 
   .join-form {
+    grid-template-columns: 1fr;
+  }
+
+  .message-form {
     grid-template-columns: 1fr;
   }
 }

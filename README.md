@@ -5,6 +5,7 @@ An incognito chatroom app with:
 - throwaway aliases
 - room-based invites
 - in-memory message storage only
+- file uploads up to 50 MB each
 - no login flow and no database
 
 ## Run it
@@ -21,6 +22,7 @@ Then open `http://localhost:3000`.
 - Messages live only in server memory.
 - Empty rooms are removed shortly after everyone leaves.
 - Restarting the server wipes every room and message.
+- Uploaded files are also kept only in server memory.
 
 ## Deploy it
 

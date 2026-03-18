@@ -28,9 +28,12 @@ const joinForm = document.querySelector("#join-form");
 const messageForm = document.querySelector("#message-form");
 const messageInput = document.querySelector("#message-input");
 const sendButton = document.querySelector("#send-button");
+const fileButton = document.querySelector("#file-button");
+const fileInput = document.querySelector("#file-input");
 const createRoomButton = document.querySelector("#create-room");
 const copyLinkButton = document.querySelector("#copy-link");
 const messageTemplate = document.querySelector("#message-template");
+const MAX_UPLOAD_SIZE_BYTES = 50 * 1024 * 1024;
 
 let socket;
 let joinedRoom = "";
@@ -70,6 +73,7 @@ function updateInviteLinkState() {
 function setChatEnabled(enabled) {
   messageInput.disabled = !enabled;
   sendButton.disabled = !enabled;
+  fileButton.disabled = !enabled;
 }
 
 function formatTime(timestamp) {
@@ -79,19 +83,75 @@ function formatTime(timestamp) {
   }).format(new Date(timestamp));
 }
 
+function formatFileSize(bytes) {
+  if (bytes < 1024) {
+    return `${bytes} B`;
+  }
+
+  if (bytes < 1024 * 1024) {
+    return `${(bytes / 1024).toFixed(1)} KB`;
+  }
+
+  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+}
+
+function createMessageContent(message) {
+  if (message.type === "file") {
+    const link = document.createElement("a");
+    link.className = "attachment";
+    link.href = message.url;
+    link.target = "_blank";
+    link.rel = "noopener";
+
+    const name = document.createElement("span");
+    name.className = "attachment-name";
+    name.textContent = message.fileName;
+
+    const meta = document.createElement("span");
+    meta.className = "attachment-size";
+    meta.textContent = `${formatFileSize(message.fileSize)} download`;
+
+    link.append(name, meta);
+    return link;
+  }
+
+  const text = document.createElement("p");
+  text.className = "message-text";
+  text.textContent = message.text;
+  return text;
+}
+
 function appendMessage(message) {
   const node = messageTemplate.content.firstElementChild.cloneNode(true);
   node.classList.toggle("system", message.type === "system");
   node.querySelector(".message-author").textContent =
     message.type === "system" ? "System" : message.alias;
   node.querySelector(".message-time").textContent = formatTime(message.createdAt);
-  node.querySelector(".message-text").textContent = message.text;
+  node.querySelector(".message-content").append(createMessageContent(message));
   messages.append(node);
   messages.scrollTop = messages.scrollHeight;
 }
 
 function resetMessages() {
   messages.innerHTML = "";
+}
+
+function readFileAsBase64(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+
+    reader.addEventListener("load", () => {
+      const result = String(reader.result || "");
+      const [, encoded = ""] = result.split(",");
+      resolve(encoded);
+    });
+
+    reader.addEventListener("error", () => {
+      reject(new Error("Could not read that file."));
+    });
+
+    reader.readAsDataURL(file);
+  });
 }
 
 function connect(roomId, alias) {
@@ -227,6 +287,66 @@ createRoomButton.addEventListener("click", async () => {
     setStatus(`Room #${data.roomId} is ready. Pick an alias and enter.`);
   } catch {
     setStatus("Could not create a room right now.", true);
+  }
+});
+
+fileButton.addEventListener("click", () => {
+  if (!joinedRoom || !joinedAlias) {
+    setStatus("Join a room before uploading files.", true);
+    return;
+  }
+
+  fileInput.click();
+});
+
+fileInput.addEventListener("change", async () => {
+  const [file] = fileInput.files || [];
+
+  if (!file) {
+    return;
+  }
+
+  if (!joinedRoom || !joinedAlias) {
+    setStatus("Join a room before uploading files.", true);
+    fileInput.value = "";
+    return;
+  }
+
+  if (file.size > MAX_UPLOAD_SIZE_BYTES) {
+    setStatus("Files must be 50 MB or smaller.", true);
+    fileInput.value = "";
+    return;
+  }
+
+  setStatus(`Uploading ${file.name}...`);
+
+  try {
+    const data = await readFileAsBase64(file);
+    const response = await fetch("/api/upload", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        roomId: joinedRoom,
+        alias: joinedAlias,
+        fileName: file.name,
+        contentType: file.type || "application/octet-stream",
+        data,
+      }),
+    });
+
+    const payload = await response.json();
+
+    if (!response.ok) {
+      throw new Error(payload.error || "Upload failed.");
+    }
+
+    setStatus(`${file.name} shared in #${joinedRoom}.`);
+  } catch (error) {
+    setStatus(error.message || "Could not upload that file.", true);
+  } finally {
+    fileInput.value = "";
   }
 });
 

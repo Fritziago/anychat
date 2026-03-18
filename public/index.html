@@ -60,10 +60,14 @@
             placeholder="Write a message that disappears with the room..."
             disabled
           />
+          <button id="file-button" class="button button-ghost" type="button" disabled>
+            Upload file
+          </button>
           <button id="send-button" class="button button-primary" type="submit" disabled>
             Send
           </button>
         </form>
+        <input id="file-input" type="file" hidden />
       </section>
     </main>
 
@@ -73,7 +77,7 @@
           <span class="message-author"></span>
           <time class="message-time"></time>
         </div>
-        <p class="message-text"></p>
+        <div class="message-content"></div>
       </article>
     </template>
 

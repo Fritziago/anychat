@@ -7,6 +7,9 @@ const PUBLIC_DIR = path.join(__dirname, "public");
 const PORT = Number(process.env.PORT || 3000);
 const HOST = process.env.HOST || "0.0.0.0";
 const MAX_HISTORY = 100;
+const MAX_UPLOAD_SIZE_BYTES = 50 * 1024 * 1024;
+const MAX_UPLOAD_BODY_BYTES = 70 * 1024 * 1024;
+const MAX_FILES_PER_ROOM = 12;
 const rooms = new Map();
 const sockets = new Set();
 
@@ -29,6 +32,7 @@ function getRoom(roomId) {
       id: normalized,
       createdAt: Date.now(),
       history: [],
+      files: new Map(),
       clients: new Set(),
     });
   }
@@ -46,6 +50,91 @@ function sanitizeRoomId(value) {
 
 function createRoomId() {
   return crypto.randomBytes(3).toString("hex");
+}
+
+function getExistingRoom(roomId) {
+  const normalized = sanitizeRoomId(roomId);
+  if (!normalized) {
+    return null;
+  }
+
+  return rooms.get(normalized) || null;
+}
+
+function sanitizeAlias(value) {
+  return String(value || "").trim().slice(0, 24);
+}
+
+function sanitizeFileName(value) {
+  const normalized = path
+    .basename(String(value || "").trim())
+    .replace(/[<>:"/\\|?*\u0000-\u001f;]/g, "_")
+    .slice(0, 120);
+
+  return normalized || "shared-file";
+}
+
+function sanitizeContentType(value) {
+  const normalized = String(value || "").trim().toLowerCase();
+  if (!/^[a-z0-9!#$&^_.+-]+\/[a-z0-9!#$&^_.+-]+$/i.test(normalized)) {
+    return "application/octet-stream";
+  }
+
+  return normalized;
+}
+
+function sendJsonResponse(res, statusCode, payload) {
+  res.writeHead(statusCode, {
+    "Content-Type": "application/json; charset=utf-8",
+    "Cache-Control": "no-store",
+  });
+  res.end(JSON.stringify(payload));
+}
+
+function readJsonBody(req, maxBytes) {
+  return new Promise((resolve, reject) => {
+    const chunks = [];
+    let totalBytes = 0;
+    let tooLarge = false;
+
+    req.on("data", (chunk) => {
+      totalBytes += chunk.length;
+      if (tooLarge) {
+        return;
+      }
+
+      if (totalBytes > maxBytes) {
+        tooLarge = true;
+        return;
+      }
+
+      chunks.push(chunk);
+    });
+
+    req.on("end", () => {
+      if (tooLarge) {
+        const error = new Error("Upload is too large.");
+        error.statusCode = 413;
+        reject(error);
+        return;
+      }
+
+      try {
+        const rawBody = Buffer.concat(chunks).toString("utf8");
+        resolve(rawBody ? JSON.parse(rawBody) : {});
+      } catch {
+        const error = new Error("Malformed JSON body.");
+        error.statusCode = 400;
+        reject(error);
+      }
+    });
+
+    req.on("error", reject);
+  });
+}
+
+function createDownloadUrl(roomId, fileId) {
+  return `/files/${roomId}/${fileId}`;
 }
 
 function sendJson(ws, payload) {
@@ -175,6 +264,20 @@ function createChatMessage(alias, text) {
   };
 }
 
+function createFileMessage(alias, file) {
+  return {
+    id: crypto.randomUUID(),
+    type: "file",
+    alias,
+    fileId: file.id,
+    fileName: file.name,
+    fileSize: file.size,
+    contentType: file.contentType,
+    url: createDownloadUrl(file.roomId, file.id),
+    createdAt: Date.now(),
+  };
+}
+
 function trimHistory(room) {
   if (room.history.length > MAX_HISTORY) {
     room.history.splice(0, room.history.length - MAX_HISTORY);
@@ -227,7 +330,7 @@ function handleClientMessage(ws, rawPayload) {
 
   if (payload.type === "join") {
     const roomId = sanitizeRoomId(payload.roomId);
-    const alias = String(payload.alias || "").trim().slice(0, 24);
+    const alias = sanitizeAlias(payload.alias);
 
     if (!roomId || !alias) {
       sendJson(ws, { type: "error", message: "Room and alias are required." });
@@ -279,6 +382,123 @@ function handleClientMessage(ws, rawPayload) {
   }
 }
 
+function createContentDisposition(fileName) {
+  const fallback = fileName.replace(/[^\x20-\x7e]/g, "_").replace(/["\\]/g, "_");
+  return `attachment; filename="${fallback}"`;
+}
+
+function isAliasConnected(room, alias) {
+  for (const client of room.clients) {
+    if (client.alias === alias && !client.destroyed) {
+      return true;
+    }
+  }
+
+  return false;
+}
+
+async function handleUpload(req, res) {
+  let body;
+
+  try {
+    body = await readJsonBody(req, MAX_UPLOAD_BODY_BYTES);
+  } catch (error) {
+    sendJsonResponse(res, error.statusCode || 400, { error: error.message });
+    return;
+  }
+
+  const room = getExistingRoom(body.roomId);
+  const alias = sanitizeAlias(body.alias);
+  const fileName = sanitizeFileName(body.fileName);
+  const contentType = sanitizeContentType(body.contentType);
+  const encodedData = String(body.data || "").trim();
+
+  if (!room) {
+    sendJsonResponse(res, 404, { error: "Room not found." });
+    return;
+  }
+
+  if (!alias || !isAliasConnected(room, alias)) {
+    sendJsonResponse(res, 403, { error: "Join the room before uploading files." });
+    return;
+  }
+
+  if (!encodedData) {
+    sendJsonResponse(res, 400, { error: "No file data was provided." });
+    return;
+  }
+
+  if (room.files.size >= MAX_FILES_PER_ROOM) {
+    sendJsonResponse(res, 400, { error: "This room already has the maximum number of files." });
+    return;
+  }
+
+  const buffer = Buffer.from(encodedData, "base64");
+
+  if (!buffer.length) {
+    sendJsonResponse(res, 400, { error: "The uploaded file was empty." });
+    return;
+  }
+
+  if (buffer.length > MAX_UPLOAD_SIZE_BYTES) {
+    sendJsonResponse(res, 413, { error: "Files must be 50 MB or smaller." });
+    return;
+  }
+
+  const file = {
+    id: crypto.randomUUID(),
+    roomId: room.id,
+    name: fileName,
+    size: buffer.length,
+    contentType,
+    data: buffer,
+    createdAt: Date.now(),
+  };
+
+  room.files.set(file.id, file);
+
+  const message = createFileMessage(alias, file);
+  addHistory(room, message);
+  broadcast(room, {
+    type: "message",
+    message,
+    occupantCount: room.clients.size,
+  });
+
+  sendJsonResponse(res, 201, {
+    ok: true,
+    fileUrl: message.url,
+    message,
+  });
+}
+
+function handleFileDownload(req, res, pathname) {
+  const parts = pathname.split("/").filter(Boolean);
+  if (parts.length !== 3) {
+    res.writeHead(404);
+    res.end("Not found");
+    return;
+  }
+
+  const [, roomId, fileId] = parts;
+  const room = getExistingRoom(roomId);
+  const file = room ? room.files.get(fileId) : null;
+
+  if (!file) {
+    res.writeHead(404);
+    res.end("File not found");
+    return;
+  }
+
+  res.writeHead(200, {
+    "Content-Type": file.contentType,
+    "Content-Length": file.size,
+    "Content-Disposition": createContentDisposition(file.name),
+    "Cache-Control": "no-store",
+  });
+  res.end(file.data);
+}
+
 function serveStatic(req, res) {
   const requestPath = req.url === "/" ? "/index.html" : req.url.split("?")[0];
   const resolvedPath = path.normalize(path.join(PUBLIC_DIR, requestPath));
@@ -305,14 +525,22 @@ function serveStatic(req, res) {
   });
 }
 
-const server = http.createServer((req, res) => {
-  if (req.url && req.url.startsWith("/api/room")) {
+const server = http.createServer(async (req, res) => {
+  const pathname = new URL(req.url || "/", "http://localhost").pathname;
+
+  if (pathname === "/api/room" && req.method === "GET") {
     const roomId = createRoomId();
-    res.writeHead(200, {
-      "Content-Type": "application/json; charset=utf-8",
-      "Cache-Control": "no-store",
-    });
-    res.end(JSON.stringify({ roomId }));
+    sendJsonResponse(res, 200, { roomId });
+    return;
+  }
+
+  if (pathname === "/api/upload" && req.method === "POST") {
+    await handleUpload(req, res);
+    return;
+  }
+
+  if (pathname.startsWith("/files/") && req.method === "GET") {
+    handleFileDownload(req, res, pathname);
     return;
   }
 
